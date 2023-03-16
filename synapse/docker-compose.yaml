@@ -1,0 +1,52 @@
+version: '3'
+
+#prepare the homserver.yaml file
+# docker run --rm -it -v /synapse/data:/data -e SYNAPSE_SERVER_NAME=matrix.example.com -e SYNAPSE_REPORT_STATS=no docker.io/matrixdotorg/synapse:latest generate
+
+#prepare the database: modify the database config in the homserver.yaml file as below
+# database:
+#   name: psycopg2
+#   args:
+#     user: synapse
+#     password: synapse_pg_password
+#     database: synapse
+#     host: postgres
+#     cp_min: 5
+#     cp_max: 10
+
+#to create user
+# docker exec -it synapse-synapse-1 /bin/bash
+# register_new_matrix_user -c /data/homeserver.yaml http://localhost:8008
+
+services:
+
+  synapse:
+    image: docker.io/matrixdotorg/synapse:latest
+    # Since synapse does not retry to connect to the database, restart upon
+    # failure
+    restart: unless-stopped
+    # See the readme for a full documentation of the environment settings
+    # NOTE: You must edit homeserver.yaml to use postgres, it defaults to sqlite
+    environment:
+      - SYNAPSE_CONFIG_PATH=/data/homeserver.yaml
+    volumes:
+      # You may either store all the files in a local folder
+      - /synapse/data:/data
+    depends_on:
+      - postgres
+    # In order to expose Synapse, remove one of the following, you might for
+    ports:
+      - 8008:8008/tcp
+
+  postgres:
+    image: docker.io/postgres:12-alpine
+    # Change that password, of course!
+    environment:
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=synapse_pg_password
+      - POSTGRES_DB=synapse
+      # ensure the database gets created correctly
+      # https://matrix-org.github.io/synapse/latest/postgres.html#set-up-database
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      - /synapse/schemas:/var/lib/postgresql/data
