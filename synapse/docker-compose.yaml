@@ -1,6 +1,6 @@
 version: '3'
 
-#prepare the homserver.yaml file
+#prepare the homeserver.yaml file
 # docker run --rm -it -v /synapse/data:/data -e SYNAPSE_SERVER_NAME=matrix.example.com -e SYNAPSE_REPORT_STATS=no docker.io/matrixdotorg/synapse:latest generate
 
 #prepare the database: modify the database config in the homserver.yaml file as below
@@ -36,7 +36,7 @@ services:
       - postgres
     # In order to expose Synapse, remove one of the following, you might for
     ports:
-      - 8008:8008/tcp
+      - 127.0.0.1:8008:8008/tcp
 
   postgres:
     image: docker.io/postgres:12-alpine
