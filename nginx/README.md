@@ -25,4 +25,18 @@ sudo apt install nginx
 
 ## Modify Nginx Configuration in conf.d
 
+For example: 
+```bash
+cp conf.d/template.conf /etc/nginx/conf.d/synapse.conf
+
+# then configure the port and ws_path in synapse.conf
+```
+
 ## SSL with Let's Encrypt
+
+
+```bash
+apt install certbot python3-certbot-nginx
+
+certbot --nginx
+```
